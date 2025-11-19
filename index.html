@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WhatsApp QR Login</title>
+  <style>
+    body { font-family: Arial; background: #f2f2f2; text-align: center; padding: 50px; }
+    img { width: 300px; margin-top: 20px; }
+    input, button { margin: 10px; padding: 10px; width: 300px; }
+  </style>
+</head>
+<body>
+  <h2>WhatsApp Connection</h2>
+  <div id="status">Checking...</div>
+  <div id="qr"></div>
+
+  <button onclick="logout()">Logout</button>
+  <div id="logoutResult" style="margin-top: 10px; color: #c00;"></div>
+
+  <hr />
+  <h3>Send WhatsApp Message</h3>
+  <input type="text" id="phoneNumber" placeholder="number"/><br/>
+  <input type="text" id="message" placeholder="message"/><br/>
+  <input type="text" id="apiKey" placeholder="API Key"/><br/>
+  <button onclick="sendMessage()">Send</button>
+
+  <div id="result" style="margin-top: 15px; color: #333;"></div>
+
+<script>
+  async function loadStatus() {
+    const res = await fetch('/status');
+    const { connected } = await res.json();
+    document.getElementById('status').innerText = connected
+      ? "✅ Connected to WhatsApp"
+      : "❌ Not connected";
+
+    if (!connected) {
+      const qrRes = await fetch('/qr');
+      const qrData = await qrRes.text();
+      document.getElementById('qr').innerHTML = qrData.startsWith("data:")
+        ? `<img src="${qrData}" alt="Scan QR">`
+        : `<p>${qrData}</p>`;
+    } else {
+      document.getElementById('qr').innerHTML = "";
+    }
+  }
+
+  async function sendMessage() {
+    const phoneNumber = document.getElementById("phoneNumber").value.trim();
+    const message     = document.getElementById("message").value.trim();
+    const apiKey      = document.getElementById("apiKey").value.trim();
+    const resultBox   = document.getElementById("result");
+
+    if (!phoneNumber || !message || !apiKey) {
+      resultBox.innerText = "⚠️ Please fill all fields.";
+      return;
+    }
+
+    resultBox.innerText = "Sending...";
+
+    try {
+      const res = await fetch('/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phoneNumber, message, apiKey })
+      });
+
+      const data = await res.json();
+      resultBox.innerText = data.message || "Unknown response";
+    } catch (err) {
+      resultBox.innerText = "❌ Failed to send message.";
+    }
+  }
+
+  async function logout() {
+    const resultBox = document.getElementById("logoutResult");
+    resultBox.innerText = "Logging out...";
+
+    try {
+      const res = await fetch('/logout', { method: 'POST' });
+      const data = await res.json();
+      resultBox.innerText = data.message || "Unknown response";
+
+      if (data.status) {
+        document.getElementById("status").innerText = "❌ Not connected";
+        document.getElementById("qr").innerHTML = "";
+      }
+    } catch (err) {
+      resultBox.innerText = "❌ Logout failed.";
+    }
+  }
+
+  setInterval(loadStatus, 5000);
+  loadStatus();
+</script>
+</body>
+</html>
