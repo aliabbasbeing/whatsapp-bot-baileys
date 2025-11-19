@@ -6,6 +6,11 @@ let updateInterval = null;
 document.addEventListener('DOMContentLoaded', () => {
   loadStatus();
   startAutoUpdate();
+  
+  // Add event listeners
+  document.getElementById('sendForm').addEventListener('submit', sendMessage);
+  document.getElementById('pingBtn').addEventListener('click', sendPing);
+  document.getElementById('logoutBtn').addEventListener('click', logout);
 });
 
 // Start automatic status updates
@@ -54,12 +59,10 @@ function updateUI(status, stats) {
     qrSection.classList.add('d-none');
     disconnectedMessage.classList.add('d-none');
     
-    // Show phone number
+    // Show phone number in the status area
     if (status.phoneNumber) {
-      document.getElementById('phoneNumber').value = status.phoneNumber.replace('@s.whatsapp.net', '');
+      document.getElementById('connectedPhone').textContent = status.phoneNumber;
     }
-    
-    document.getElementById('phoneNumber').textContent = status.phoneNumber || '—';
   } else {
     statusIndicator.className = 'status-indicator status-disconnected pulse';
     statusText.textContent = 'Not Connected';

@@ -116,7 +116,7 @@
       </div>
       <div class="card-body">
         <div id="phoneInfo" class="phone-info d-none">
-          <strong>📞 Connected Number:</strong> <span id="phoneNumber">—</span>
+          <strong>📞 Connected Number:</strong> <span id="connectedPhone">—</span>
         </div>
         <div id="qrSection" class="qr-container d-none">
           <h5 class="mb-3">Scan QR Code with WhatsApp</h5>
@@ -163,10 +163,10 @@
       </div>
       <div class="card-body">
         <div class="d-grid gap-2 d-md-flex">
-          <button class="btn btn-success btn-custom flex-fill" onclick="sendPing()">
+          <button id="pingBtn" class="btn btn-success btn-custom flex-fill">
             💚 Send Keepalive Ping
           </button>
-          <button class="btn btn-danger btn-custom flex-fill" onclick="logout()">
+          <button id="logoutBtn" class="btn btn-danger btn-custom flex-fill">
             🚪 Logout Session
           </button>
         </div>
@@ -180,7 +180,7 @@
         📤 Send Test Message
       </div>
       <div class="card-body">
-        <form id="sendForm" onsubmit="sendMessage(event)">
+        <form id="sendForm">
           <div class="mb-3">
             <label for="phoneNumber" class="form-label">Phone Number</label>
             <input 
